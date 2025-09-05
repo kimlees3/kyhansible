@@ -1,0 +1,8 @@
+---
+- name: 파일 지우기
+  hosts: all
+  tasks: 
+    - name: 파일 지우기 - /home/devops/users.txt
+      ansible.builtin.file:
+        path: /home/devops/users.txt
+        state: absent

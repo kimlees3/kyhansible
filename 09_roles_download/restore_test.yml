@@ -1,0 +1,9 @@
+---
+- name: Restore test.yml
+  hosts: all
+  roles:
+    - rollback-svc
+  vars:
+    files:
+      - /var/www/html/index.html
+

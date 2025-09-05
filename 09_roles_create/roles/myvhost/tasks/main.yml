@@ -1,0 +1,45 @@
+---
+# tasks file for roles/myvhost
+- name: 패키지 설치 - httpd, mod_ssl
+  ansible.builtin.dnf:
+    name:
+      - httpd
+      - mod_ssl
+    state: present
+
+
+
+- name: 서비스 설정 - /var/www/vhosts/{{ ansible_hostname }}디렉토리 생성
+  ansible.builtin.file:
+    path: /var/www/vhosts/{{ ansible_hostname }}
+    state: directory
+    owner: root  
+    group: root 
+    mode: '0755'
+
+- name: 서비스 설정 - /var/www/vhosts/ansible1/index.html
+  ansible.builtin.copy:
+    src: index.html
+    dest: /var/www/vhosts/{{ ansible_hostname }}/index.html
+    mode: '0644'
+
+- name: 서비스 기동 - httpd
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: true 
+  loop:
+    - httpd
+
+- name: 서비스 설정 - /etc/httpd/conf.d/vhost.conf
+  ansible.builtin.template:
+    src: vhost.conf.j2
+    dest: /etc/httpd/conf.d/vhost.conf
+    owner: root
+    group: root 
+    mode: '0644'
+  notify: 
+    - restart httpd
+
+
+  

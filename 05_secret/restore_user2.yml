@@ -1,0 +1,11 @@
+---
+- name: restore create_user.yml/create_user2.yml
+  hosts: all
+  vars_files: 
+    - secret2.yml 
+  tasks: 
+    - name: secret을 사용한 user1 사용자 추가
+      ansible.builtin.user:
+        name: "{{ username }}"
+        state: absent
+      

@@ -1,0 +1,8 @@
+---
+- name: SELinux 설정
+  hosts: all
+  tasks: 
+    - name: SELinux -permissive -> enforcing
+      ansible.posix.selinux:
+        policy: targeted 
+        state: enforcing

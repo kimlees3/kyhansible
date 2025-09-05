@@ -1,0 +1,61 @@
+---
+- name: DB 설치 작업
+  hosts: databases
+  remote_user: root 
+  vars:
+    pkg_db: 
+      - mariadb-server
+      - python3-PyMySQL
+    svc_db: mariadb
+    conf_get_url: 'http://control/my.cnf.standard'
+    conf_mysql: '/etc/my.cnf'
+  tasks: 
+    #############################################
+    # 1) DB 패키지 설치 - mariadb-server, python3-PyMySQL
+    # + DB 암호 설정(soldesk1., ALL)
+    # 2) DB 서비스 기동 - mariadb
+    # 3) ansible:/var/www/html/my.cnf.standard --get_url --> /etc/my.conf
+    # + DB 서비스 재기동 
+    #############################################
+    - name: 1) DB 패키지 설치
+      ansible.builtin.dnf:
+        name: "{{ pkg_db }}"
+        state: present
+
+    - name: 2) DB 서비스 기동
+      ansible.builtin.systemd:
+        name: "{{ svc_db }}"
+        state: started
+        enabled: true
+      notify: 
+        - set db password
+
+    - name: 설정 파일 생성 - /etc/my.conf
+      ansible.builtin.get_url:
+        url: "{{ conf_get_url }}"
+        dest: "{{ conf_mysql }}"
+        owner: root
+        group: root
+        mode: '0644'
+      notify:
+        - restart db service
+
+  
+  
+  handlers: 
+    - name: set db password
+      community.mysql.mysql_user:
+        name: root
+        password: soldesk1.
+        priv: '*.*:ALL'
+        state: present
+        login_user: root
+        login_password: 'soldesk1.'
+        login_unix_socket: /var/lib/mysql/mysql.sock
+    
+    - name: restart db service
+      ansible.builtin.systemd:
+        name: "{{ svc_db }}"
+        state: restarted 
+
+

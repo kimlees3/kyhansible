@@ -1,0 +1,9 @@
+---
+- name: 모든 관리 대상 호스트 종료
+  hosts: all 
+  gather_facts: false
+  tasks:
+    - name: 모든 관리 대상 호스트 서버 종료
+      community.general.shutdown:
+        delay: 0
+      ignore_errors: true

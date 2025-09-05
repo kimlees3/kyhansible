@@ -1,0 +1,32 @@
+---
+####################################################
+#  작업
+# * 사용자/암호 추가 - developer/developer
+# * 키 쌍 배포(pubkey 배포)
+# * /etc/sudoers.d/developer
+# ---------------------------------
+# developer  ALL: (ALL) NOPASSWD: ALL 
+# ----------------------------------
+####################################################
+- name: 사용자 추가
+  hosts: all 
+  gather_facts: false
+  vars:
+    username: developer
+    password: developer 
+  tasks: 
+    - name: 사용자/암호 추가 - developer/developer
+      ansible.builtin.user:
+        name: "{{ username }}"
+        password: "{{ password | password_hash('sha512') }}"
+    
+    - name: 키 쌍 배포(pubkey 배포)
+      ansible.posix.authorized_key:
+        user: "{{ username }}"
+        state: present
+        key: "{{ lookup('file', '/home/ansible/.ssh/id_rsa.pub') }}"
+    - name: 3) /etc/sudoers.d/developer 파일 생성
+      ansible.builtin.copy:
+        content: "{{ username }} ALL=(ALL) NOPASSWD: ALL\n"
+        dest: "/etc/sudoers.d/{{ username }}"
+

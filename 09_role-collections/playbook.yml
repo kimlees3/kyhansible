@@ -1,0 +1,21 @@
+---
+##################################
+# 서버 시간 동기화
+# 1) timezone 맞추기 - Asia/Seoul
+# 2) NTP 서버에 시간 동기화
+##################################
+- name: 서버 시간 동기화
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: 1) timezone 맞추기 - Asia/Seoul
+      community.general.timezone:
+        name: Asia/Seoul
+    
+    - name: NTP 서버에 시간 동기화
+      ansible.builtin.include_role:
+        name: fedora.linux_system_roles.timesync
+      vars:
+        timesync_ntp_servers:
+          - hostname: kr.pool.ntp.org
+            iburst: true

@@ -1,0 +1,57 @@
+---
+- name: 웹 서버 설정 및 테스트
+  hosts: web1.example.com
+  tasks:
+  ####################################
+  # 1) 패키지 설치 - httpd,firewalld
+  # 2) 서비스 설정 - /var/www/html/index.html
+  # 3) 서비스 기동 - httpd, firewalld
+  # 4) 방화벽 등록 - http
+  # 5) SELinux 등록 (?)
+  ####################################
+
+    - name: 패키지 설치 - (yum,dnf)
+      ansible.builtin.dnf:
+        name: 
+        - httpd
+        - firewalld
+        state : present
+    - name: 서비스 설정 - (copy) /var/www/html/index.html
+      ansible.builtin.copy:
+        content: 'Test Web Page - web1.example.com\n'
+        dest: /var/www/html/index.html
+        mode: '0644'
+    - name: 서비스 기동 - (service, systemd) httpd, firewalld
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        state: started
+        enabled: true
+      loop:
+        - httpd
+        - firewalld
+    - name: 방화벽 등록 - (firewalld) http
+      ansible.posix.firewalld:
+        service: http
+        permanent: true
+        immediate: true
+        state: enabled
+
+- name: 웹 요청 테스트
+  hosts: localhost
+  become: false
+  tasks: 
+    - name: 1) (uri) web1.example.com으로 웹 요청
+      ansible.builtin.uri:
+        url: http://web1.example.com
+        status_code: 200
+        return_content: true
+      register: output
+
+    - name: 2) 출력내용 확인(debug)
+      ansible.builtin.debug:
+        var: output.content
+
+
+      
+
+

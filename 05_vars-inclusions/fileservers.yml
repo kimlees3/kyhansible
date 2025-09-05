@@ -1,0 +1,23 @@
+---
+###################################################
+# 1. Play01: 파일 서버 설정
+# * 1) 변수 포함
+# * 2) 원격 디렉토리 생성
+# * 3) 디버깅 메세지
+###################################################
+- name: 1. Play01 파일 서버 설정
+  hosts: fileservers
+  tasks:
+    - name: 1) 변수 포함
+      ansible.builtin.include_vars: paths.yml
+
+    - name: 2) 원격 디렉토리 생성 - {{ paths.fileserver }}
+      ansible.builtin.file:
+        path: "{{ paths.fileserver }}"
+        state: directory
+        mode: '0755'
+      register: output
+    
+    - name: 3) 디버그 메세지
+      ansible.builtin.debug:
+        var: output.path

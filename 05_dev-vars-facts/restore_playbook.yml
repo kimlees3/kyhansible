@@ -1,0 +1,38 @@
+---
+- name: Restore playbook.yml
+  hosts: all
+  tasks:
+    ####################################
+    # 1) 방화벽 포트 제거
+    # 2) 서비스 종료
+    # 3) 패키지 삭제
+    # 4) 팩트 삭제
+    ####################################
+    - name: 1) 방화벽에 포트 제거
+      ansible.posix.firewalld:
+        service: "{{ ansible_local.custom.general.fwsvc }}"
+        permanent: true
+        immediate: true
+        state: disabled
+      ignore_errors: true
+
+    - name: 2) 서비스 종료
+      ansible.builtin.service:
+        name: "{{ item }}"
+        enabled: false
+        state: stopped
+      loop:
+        - "{{ ansible_local.custom.general.service }}"
+        - firewalld
+      ignore_errors: true
+
+    - name: 3) 패키지 삭제
+      ansible.builtin.yum:
+        name: "{{ ansible_local.custom.general.package }}"
+        state: absent
+
+    - name: 4) 팩트 삭제
+      ansible.builtin.file:
+        path: /etc/ansible/facts.d
+        state: absent
+

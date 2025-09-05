@@ -1,0 +1,11 @@
+---
+- name: Restore Playbook
+  hosts: all
+  tasks: 
+    - name: 1) 패키지 삭제 - httpd, tomcat
+      ansible.builtin.include_tasks: remove_packages.yml
+      vars: 
+        packages:
+          - httpd
+          - tomcat
+        

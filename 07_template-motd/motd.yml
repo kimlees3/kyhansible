@@ -1,0 +1,23 @@
+---
+####################################################
+# 1) /etc/motd.d/cockpit 파일 삭제
+# 2) /etc/motd 배포
+####################################################
+- name: /etc/motd 파일 배포
+  hosts: all
+  vars:
+    system_owner: admin@example.com
+  tasks:
+    - name: 1) /etc/motd.d/cockpit 파일 삭제
+      ansible.builtin.file:
+        path: /etc/motd.d/cockpit
+        state: absent
+    - name: 2) /etc/motd 배포
+      ansible.builtin.template:
+        src: templates/motd.j2
+        dest: /etc/motd
+        owner: root
+        group: root
+        mode: '0644'
+
+

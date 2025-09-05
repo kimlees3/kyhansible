@@ -1,0 +1,44 @@
+---
+- name: DB 설치 작업
+  hosts: databases
+  remote_user: root 
+  vars:
+    pkg_db: 
+      - mariadb-server
+      - python3-PyMySQL
+    svc_db: mariadb
+    conf_get_url: 'http://control/my.cnf.standard'
+    conf_mysql: '/etc/my.cnf'
+  tasks: 
+    #############################################
+    # 1) DB 패키지 설치 - mariadb-server, python3-PyMySQL
+    # + DB 암호 설정(soldesk1., ALL)
+    # 2) DB 서비스 기동 - mariadb
+    # 3) ansible:/var/www/html/my.cnf.standard --get_url --> /etc/my.conf
+    # + DB 서비스 재기동 
+    #############################################
+    - name: 설정 파일 삭제 - /etc/my.conf
+      ansible.builtin.file:
+        path: "{{ conf_mysql }}"
+        state: absent
+
+
+
+    - name: 2) DB 서비스 중지
+      ansible.builtin.systemd:
+        name: "{{ svc_db }}"
+        state: stopped
+        enabled: false
+
+    - name: 1) DB 패키지 삭제
+      ansible.builtin.dnf:
+        name: "{{ pkg_db }}"
+        state: absent
+
+
+
+
+  
+
+
+

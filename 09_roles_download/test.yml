@@ -1,0 +1,5 @@
+---
+- name: Demo Web
+  hosts: all
+  roles:
+    - s4d0w.demoweb

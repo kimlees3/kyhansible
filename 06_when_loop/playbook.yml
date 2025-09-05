@@ -1,0 +1,27 @@
+---
+- name: Play 01 - DB 서비스 기동
+  hosts: database_dev
+  vars:
+    packages:
+      - mariadb
+      - mariadb-server
+      - python3-PyMySQL
+    service: mariadb
+  tasks:
+    ############################
+    # 1) 패키지 설치 - mariadb, mariadb-server, python3-PyMySQL
+    # 2) 서비스 기동 - mariadb 
+    ############################
+    - name: 패키지 설치
+      ansible.builtin.dnf:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ packages }}"
+      when: ansible_distribution == "CentOS"
+
+    - name: 2) 서비스 기동 - mariadb
+      ansible.builtin.systemd:
+        name: "{{ service }}"
+        state: started
+        enabled: true
+       

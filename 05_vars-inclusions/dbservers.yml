@@ -1,0 +1,24 @@
+---
+###################################################
+# 1. Play01: DB 서버 설정
+# * 1) 변수 포함
+# * 2) 원격 디렉토리 생성
+# * 3) 디버깅 메세지
+###################################################
+- name: 1. Play01 - DB 서버 설정
+  hosts: dbservers
+  tasks: 
+  - name: 1) 변수 포함 - {{ paths.dbpath }}
+    ansible.builtin.include_vars: paths.yml
+  
+  - name: 2) 원격 디렉토리 생성 
+    ansible.builtin.file:
+      path: "{{ paths.dbpath }}"
+      state: directory
+      mode: '0755'
+    register: output
+  - name: 3) 디버깅 메세지 출력
+    ansible.builtin.debug:
+      var: output.path
+
+      

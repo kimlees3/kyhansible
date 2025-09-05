@@ -1,0 +1,60 @@
+---
+- name: Restore web-db.yml
+  hosts: all
+  tasks:
+    #############################
+    # 1) 방화벽 포트 제거
+    # 2) 서비스 종료
+    # 3) 서비스 설정 삭제
+    # 4) 패키지 삭제
+    #############################
+    # 1) 방화벽 포트 제거
+    # * http, https, mysql
+    - name: 1) 방화벽 포트 제거
+      ansible.posix.firewalld:
+        service: "{{ item }}"
+        permanent: true
+        immediate: true
+        state: disabled
+      loop:
+        - http
+        - https
+        - mysql
+
+    # 2) 서비스 종료
+    # * httpd, mariadb
+    - name: 2) 서비스 종료
+      ansible.builtin.systemd:
+        name: "{{ item }}"
+        enabled: false
+        state: stopped
+      loop:
+        - httpd
+        - mariadb
+
+    # 3) 서비스 설정 삭제
+    # * /var/www/html/index.php 파일 삭제
+    - name: 3) 서비스 설정 삭제
+      ansible.builtin.file:
+        path: /var/www/html/index.php
+        state: absent
+
+    # 4) 패키지 삭제
+    # * httpd, mod_ssl, php, php-mysqlnd, php-pdo
+    # * mariadb-server, mariadb, python3-PyMySQL
+    - name: 4) 패키지 삭제
+      ansible.builtin.dnf:
+        name:
+          - httpd
+          - mod_ssl
+          - php
+          - php-mysqlnd
+          - php-pdo
+          - mariadb-server
+          - mariadb
+          - python3-PyMySQL
+          - mariadb-connector-c-config
+          - mariadb-common
+          - mariadb-connector-c
+          - mariadb-errmsg
+        state: absent

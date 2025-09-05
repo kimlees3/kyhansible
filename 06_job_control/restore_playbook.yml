@@ -1,0 +1,21 @@
+---
+- name: Restore playbook.yml
+  hosts: all
+  gather_facts: false
+  vars:
+    web_package: httpd
+    db_package: mariadb-server
+    db_service: mariadb
+  tasks:
+    - name: Stop {{ db_service }} service
+      ansible.builtin.service:
+        name: "{{ db_service }}"
+        state: stopped
+        enabled: false
+
+    - name: Remove the {{ web_package }} packages
+      ansible.builtin.yum:
+        name:
+          - "{{ web_package }}"
+          - "{{ db_package }}"
+        state: present

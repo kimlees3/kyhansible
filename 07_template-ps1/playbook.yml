@@ -1,0 +1,23 @@
+---
+- name: 0) 환경 파일 배포
+  gather_facts: false
+  hosts: all
+  remote_user: devops
+  become: false
+  tasks:
+    - name: 1) devops 사용자 환경 파일 배포
+      # $HOME/.bashrc
+      ansible.builtin.template: 
+        src: templates/bashrc.j2
+        dest: /home/devops/.bashrc
+        owner: devops
+        group: devops
+        mode: '0644'
+
+    - name: 2) 관리 호스트에 ble.sh 디렉토리 배포
+      # $HOME/.local/share/ble.sh/
+      ansible.builtin.copy:
+        src: files/blesh
+        dest: /home/devops/.local/share/
+        owner: devops
+        group: devops

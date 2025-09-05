@@ -1,0 +1,12 @@
+---
+- name: 시크릿 사용자 제거
+  hosts: devservers
+  vars_files: vars/secret.yml
+  tasks: 
+    - name: 시크릿 사용자 제거하기
+      ansible.builtin.user:
+        name: "{{ item }}"
+        state: absent
+        remove: yes
+      loop: 
+        - name: "{{ newusers }}"
