@@ -1,0 +1,46 @@
+---
+# tasks file for roles/rollback-svc
+######################################################
+# 방화벽 포트 제거
+# 서비스 종료
+# 서비스 설정 삭제
+# 패키지 삭제
+######################################################
+
+- name: 방화벽 포트 제거
+  ansible.posix.firewalld:
+    service: "{{ item }}"
+    state: disabled
+    permanent: true
+    immediate: true 
+  loop: "{{ fw_svcs | default([]) }}"
+  ignore_errors: true
+- name: 방화벽에서 포트 제거
+  ansible.posix.firewalld:
+    port: "{{ item }}" # 'service:' 대신 'port:' 사용
+    state: disabled
+    permanent: true
+    immediate: true
+  loop: "{{ fw_ports | default([]) }}" # fw_ports 변수 사용
+  ignore_errors: true
+- name: 서비스 종료
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: stopped
+    enabled: false
+  loop: "{{ svcs }}"
+  ignore_errors: true
+
+- name: 서비스 설정 삭제
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop: "{{ files }}"
+
+- name: 패키지 삭제
+  ansible.builtin.dnf:
+    name: "{{ item }}"
+    state: absent
+  loop: "{{ pkgs }}"
+    
+    
